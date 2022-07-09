@@ -138,7 +138,25 @@ void show3DObjects(std::vector<BoundingBox> &boundingBoxes, cv::Size worldSize, 
 // associate a given bounding box with the keypoints it contains
 void clusterKptMatchesWithROI(BoundingBox &boundingBox, std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPoint> &kptsCurr, std::vector<cv::DMatch> &kptMatches)
 {
-    // ...
+    float distance_sum = 0;
+    for (auto match : kptMatches)
+    {
+        distance_sum += abs(match.distance);
+    }
+
+    float distance_mean = distance_sum / kptMatches.size();
+
+    for (auto match : kptMatches)
+    {
+        const cv::KeyPoint kptPrev = kptsPrev[match.queryIdx];
+        const cv::KeyPoint kptCurr = kptsCurr[match.trainIdx];
+
+        if (boundingBox.roi.contains(kptCurr.pt) && abs(match.distance) < abs(distance_mean))
+        {
+            boundingBox.keypoints.push_back(kptCurr);
+            boundingBox.kptMatches.push_back(match);
+        }
+    }
 }
 
 
@@ -146,7 +164,64 @@ void clusterKptMatchesWithROI(BoundingBox &boundingBox, std::vector<cv::KeyPoint
 void computeTTCCamera(std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPoint> &kptsCurr, 
                       std::vector<cv::DMatch> kptMatches, double frameRate, double &TTC, cv::Mat *visImg)
 {
-    // ...
+    // compute distance ratios between all matched keypoints
+    vector<double> distRatios; // stores the distance ratios for all keypoints between curr. and prev. frame
+    
+    for (auto it1 = kptMatches.begin(); it1 != kptMatches.end() - 1; ++it1)
+    { // outer keypoint loop
+        
+        // get current keypoint and its matched partner in the prev. frame
+        cv::KeyPoint kpOuterCurr = kptsCurr.at(it1->trainIdx);
+        cv::KeyPoint kpOuterPrev = kptsPrev.at(it1->queryIdx);
+        
+        for (auto it2 = kptMatches.begin() + 1; it2 != kptMatches.end(); ++it2)
+        { // inner keypoint loop
+
+            double minDist = 100.0; // min. required distance
+
+            // get next keypoint and its matched partner in the prev. frame
+            cv::KeyPoint kpInnerCurr = kptsCurr.at(it2->trainIdx);
+            cv::KeyPoint kpInnerPrev = kptsPrev.at(it2->queryIdx);
+
+            // compute distances and distance ratios
+            double distCurr = cv::norm(kpOuterCurr.pt - kpInnerCurr.pt);
+            double distPrev = cv::norm(kpOuterPrev.pt - kpInnerPrev.pt);
+
+            if (distPrev > std::numeric_limits<double>::epsilon() && distCurr >= minDist)
+            { // avoid division by zero
+
+                double distRatio = distCurr / distPrev;
+                distRatios.push_back(distRatio);
+            }
+        } // eof inner loop over all matched kpts
+    }     // eof outer loop over all matched kpts
+
+    // only continue if list of distance ratios is not empty
+    if (distRatios.size() == 0)
+    {
+        TTC = NAN;
+        return;
+    }
+
+    // compute camera-based TTC from distance ratios
+    double meanDistRatio = std::accumulate(distRatios.begin(), distRatios.end(), 0.0) / distRatios.size();
+
+    double medianDistRatio;
+    if(distRatios.size()%2 == 1)
+    {
+        medianDistRatio = (distRatios[0] + distRatios[distRatios.size()]-1) / 2;
+    }
+    else
+    {
+        medianDistRatio = ( distRatios[distRatios.size()/2] + distRatios[distRatios.size()/2+1] )/2;
+    }
+
+
+    double dT = 1 / frameRate;
+    //TTC = -dT / (1 - meanDistRatio);
+    TTC = -dT / (1-medianDistRatio);
+
+    
 }
 
 
@@ -154,21 +229,32 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
                      std::vector<LidarPoint> &lidarPointsCurr, double frameRate, double &TTC)
 {
         // auxiliary variables
+        double dT = 1/frameRate;
+        double laneWidth = 4.0;
 
     // find closest distance to Lidar points within ego lane
     double minXPrev = 1e9, minXCurr = 1e9;
+    
     for (auto it = lidarPointsPrev.begin(); it != lidarPointsPrev.end(); ++it)
     {
-        minXPrev = minXPrev > it->x ? it->x : minXPrev;
+        if(it->y <= (laneWidth/2) && it->y >= (laneWidth/2 * -1))
+        {
+            minXPrev = minXPrev > it->x ? it->x : minXPrev;
+        }
+        
     }
 
     for (auto it = lidarPointsCurr.begin(); it != lidarPointsCurr.end(); ++it)
     {
-        minXCurr = minXCurr > it->x ? it->x : minXCurr;
+        if(it->y <= (laneWidth/2) && it->y >= (laneWidth/2 * -1))
+        {
+            minXCurr = minXCurr > it->x ? it->x : minXCurr;
+        }
+        
     }
 
     // compute TTC from both measurements
-    TTC = minXCurr  / (minXPrev - minXCurr) / frameRate;
+    TTC = minXCurr * dT / (minXPrev - minXCurr);
 }
 
 
