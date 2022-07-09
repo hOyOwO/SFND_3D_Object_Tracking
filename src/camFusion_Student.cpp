@@ -109,9 +109,9 @@ void show3DObjects(std::vector<BoundingBox> &boundingBoxes, cv::Size worldSize, 
         // augment object with some key data
         char str1[200], str2[200];
         sprintf(str1, "id=%d, #pts=%d", it1->boxID, (int)it1->lidarPoints.size());
-        putText(topviewImg, str1, cv::Point2f(left-250, bottom+50), cv::FONT_ITALIC, 2, currColor);
+        putText(topviewImg, str1, cv::Point2f(left, bottom+50), cv::FONT_ITALIC, 1, currColor);
         sprintf(str2, "xmin=%2.2f m, yw=%2.2f m", xwmin, ywmax-ywmin);
-        putText(topviewImg, str2, cv::Point2f(left-250, bottom+125), cv::FONT_ITALIC, 2, currColor);  
+        putText(topviewImg, str2, cv::Point2f(left, bottom+125), cv::FONT_ITALIC, 1, currColor);  
     }
 
     // plot distance markers
@@ -157,7 +157,31 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
 }
 
 
+
 void matchBoundingBoxes(std::vector<cv::DMatch> &matches, std::map<int, int> &bbBestMatches, DataFrame &prevFrame, DataFrame &currFrame)
 {
-    // ...
+    
+    for (const auto prevBox : prevFrame.boundingBoxes)
+    {
+        int max_counter = 0;
+        for (const auto currBox : currFrame.boundingBoxes)
+        {
+            int counter = 0;
+            for (const auto match : matches)
+            {
+                const cv::Point2f prevPt = prevFrame.keypoints[match.queryIdx].pt;
+                const cv::Point2f currPt = currFrame.keypoints[match.trainIdx].pt;
+
+                if (prevBox.roi.contains(prevPt) && currBox.roi.contains(currPt))
+                {
+                    counter++;
+                }
+            }
+            if (counter > max_counter)
+            {
+                max_counter = counter;
+                bbBestMatches[prevBox.boxID] = currBox.boxID;
+            }
+        }
+    }
 }
