@@ -42,4 +42,12 @@ In this final project, you will implement the missing parts in the schematic. To
 2. FP.2: Compute Lidar-based TTC
     * reference: Lesson 3
     * TTC = minXCurr * dT / (minXPrev - minXCurr)
-    * dT = 1 / dataFrame
+3. FP.3 : Associate Keypoint Correspondences with Bounding Boxes
+    * check current point is in bounding box or not
+    * if inside bounding box, add keypoint and match
+4. FP.4 : Compute Camera-based TTC
+    * Make the ratio the distances each frame. (distCurr/ distPrev)
+    * Calculate the TTC with median of ratio.
+5. FP.5 : Performance Evaluation 1
+    * Look for several examples where you have the impression that the Lidar-based TTC estimate is way off
+    * provide a sound argumentation why you think this happened
