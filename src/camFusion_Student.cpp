@@ -210,6 +210,54 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
     // find closest distance to Lidar points within ego lane
     double minXPrev = 1e9, minXCurr = 1e9;
     
+    //lidar point filtering by mean, standard deviation
+    double sum_lidarPrev = 0;
+    for (auto it = lidarPointsPrev.begin(); it != lidarPointsPrev.end(); ++it)
+    {
+        sum_lidarPrev += it->x; 
+    }
+    double mean_lidarPrev = sum_lidarPrev / lidarPointsPrev.size();
+    double std_lidarPrev = 0;
+    for (auto it = lidarPointsPrev.begin(); it != lidarPointsPrev.end(); ++it)
+    {
+        std_lidarPrev += (it->x - mean_lidarPrev) * (it->x - mean_lidarPrev) / lidarPointsPrev.size();
+    }
+    std_lidarPrev = sqrt (std_lidarPrev);
+
+    double sum_lidarCurr = 0;
+    for (auto it = lidarPointsCurr.begin(); it != lidarPointsCurr.end(); ++it)
+    {
+        sum_lidarCurr += it->x; 
+    }
+    double mean_lidarCurr = sum_lidarCurr / lidarPointsPrev.size();
+    double std_lidarCurr = 0;
+    for (auto it = lidarPointsCurr.begin(); it != lidarPointsCurr.end(); ++it)
+    {
+        std_lidarCurr += (it->x - mean_lidarCurr) * (it->x - mean_lidarCurr) / lidarPointsCurr.size();
+    }
+    std_lidarCurr = sqrt (std_lidarCurr);
+    
+    
+    for (auto it = lidarPointsPrev.begin(); it != lidarPointsPrev.end(); ++it)
+    {
+        if(it->x >= mean_lidarPrev - (2.5 * std_lidarPrev) && it->x <= mean_lidarPrev + (2.5 * std_lidarPrev) )
+        {
+            minXPrev = minXPrev > it->x ? it->x : minXPrev;
+        }
+        
+    }
+
+    for (auto it = lidarPointsCurr.begin(); it != lidarPointsCurr.end(); ++it)
+    {
+        if(it->x >= mean_lidarCurr - (2.5 * std_lidarCurr) && it->x <= mean_lidarCurr + (2.5 * std_lidarCurr) )
+        {
+            minXCurr = minXCurr > it->x ? it->x : minXCurr;
+        }
+        
+    }
+
+/*
+
     for (auto it = lidarPointsPrev.begin(); it != lidarPointsPrev.end(); ++it)
     {
         if(it->y <= (laneWidth/2) && it->y >= (laneWidth/2 * -1))
@@ -226,7 +274,7 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
             minXCurr = minXCurr > it->x ? it->x : minXCurr;
         }
         
-    }
+    }*/ //before
 
     // compute TTC from both measurements
     TTC = minXCurr * dT / (minXPrev - minXCurr);

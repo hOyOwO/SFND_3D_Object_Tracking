@@ -133,7 +133,7 @@ int main(int argc, const char *argv[])
         bVis = true;
         if(bVis)
         {
-            show3DObjects((dataBuffer.end()-1)->boundingBoxes, cv::Size(4.0, 20.0), cv::Size(500, 500), bVis);
+            show3DObjects((dataBuffer.end()-1)->boundingBoxes, cv::Size(4.0, 20.0), cv::Size(1000, 1000), bVis);
         }
         bVis = false;
 
@@ -151,17 +151,22 @@ int main(int argc, const char *argv[])
 
         // extract 2D keypoints from current image
         vector<cv::KeyPoint> keypoints; // create empty feature list for current image
-        string detectorType = "SHITOMASI";
-
+        string detectorType = "FAST";
+        //vector<string> DetectorTypeVector = {"SHITOMASI", "HARRIS", "FAST", "BRISK", "ORB", "AKAZE", "SIFT"};
+        
         if (detectorType.compare("SHITOMASI") == 0)
         {
             detKeypointsShiTomasi(keypoints, imgGray, false);
         }
-        else
-        {
-            //...
-        }
-
+        else if(detectorType.compare("HARRIS") == 0)
+            {
+                detKeypointsHarris(keypoints, imgGray, bVis);    
+            }
+        else // when other detector type selected
+            {
+                detKeypointsModern(keypoints, imgGray, detectorType, bVis);
+            }
+        
         // optional : limit number of keypoints (helpful for debugging and learning)
         bool bLimitKpts = false;
         if (bLimitKpts)
@@ -185,11 +190,13 @@ int main(int argc, const char *argv[])
         /* EXTRACT KEYPOINT DESCRIPTORS */
 
         cv::Mat descriptors;
-        string descriptorType = "BRISK"; // BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT
+        string descriptorType = "BRIEF"; // BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT
+        // vector<string> DescriptorTypeVector = {"BRISK", "BRIEF", "ORB", "FREAK", "AKAZE", "SIFT"};
         descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
 
         // push descriptors for current frame to end of data buffer
         (dataBuffer.end() - 1)->descriptors = descriptors;
+        
 
         cout << "#6 : EXTRACT DESCRIPTORS done" << endl;
 
@@ -201,8 +208,11 @@ int main(int argc, const char *argv[])
 
             vector<cv::DMatch> matches;
             string matcherType = "MAT_BF";        // MAT_BF, MAT_FLANN
-            string descriptorType = "DES_BINARY"; // DES_BINARY, DES_HOG
-            string selectorType = "SEL_NN";       // SEL_NN, SEL_KNN
+            //string matcherType = "MAT_FLANN";        // MAT_BF, MAT_FLANN
+            //string descriptorType = "DES_BINARY"; // DES_BINARY, DES_HOG
+            string descriptorType = "DES_HOG"; // DES_BINARY, DES_HOG
+            //string selectorType = "SEL_NN";       // SEL_NN, SEL_KNN
+            string selectorType = "SEL_KNN";       // SEL_NN, SEL_KNN
 
             matchDescriptors((dataBuffer.end() - 2)->keypoints, (dataBuffer.end() - 1)->keypoints,
                              (dataBuffer.end() - 2)->descriptors, (dataBuffer.end() - 1)->descriptors,
