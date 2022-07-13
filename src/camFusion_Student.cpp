@@ -217,19 +217,21 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
         sum_lidarPrev += it->x; 
     }
     double mean_lidarPrev = sum_lidarPrev / lidarPointsPrev.size();
+    //cout << "mean: "<< mean_lidarPrev << endl;
     double std_lidarPrev = 0;
     for (auto it = lidarPointsPrev.begin(); it != lidarPointsPrev.end(); ++it)
     {
         std_lidarPrev += (it->x - mean_lidarPrev) * (it->x - mean_lidarPrev) / lidarPointsPrev.size();
     }
     std_lidarPrev = sqrt (std_lidarPrev);
+    //cout << "std lidarPrev" << std_lidarPrev << endl;
 
     double sum_lidarCurr = 0;
     for (auto it = lidarPointsCurr.begin(); it != lidarPointsCurr.end(); ++it)
     {
         sum_lidarCurr += it->x; 
     }
-    double mean_lidarCurr = sum_lidarCurr / lidarPointsPrev.size();
+    double mean_lidarCurr = sum_lidarCurr / lidarPointsCurr.size();
     double std_lidarCurr = 0;
     for (auto it = lidarPointsCurr.begin(); it != lidarPointsCurr.end(); ++it)
     {
@@ -237,10 +239,14 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
     }
     std_lidarCurr = sqrt (std_lidarCurr);
     
-    
+
+
+
+
+    double std_multiple = 1.8;
     for (auto it = lidarPointsPrev.begin(); it != lidarPointsPrev.end(); ++it)
     {
-        if(it->x >= mean_lidarPrev - (2.5 * std_lidarPrev) && it->x <= mean_lidarPrev + (2.5 * std_lidarPrev) )
+        if(it->x >= mean_lidarPrev - (std_multiple * std_lidarPrev) && it->x <= mean_lidarPrev + (std_multiple * std_lidarPrev) )
         {
             minXPrev = minXPrev > it->x ? it->x : minXPrev;
         }
@@ -249,33 +255,15 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
 
     for (auto it = lidarPointsCurr.begin(); it != lidarPointsCurr.end(); ++it)
     {
-        if(it->x >= mean_lidarCurr - (2.5 * std_lidarCurr) && it->x <= mean_lidarCurr + (2.5 * std_lidarCurr) )
+        if(it->x >= mean_lidarCurr - (std_multiple * std_lidarCurr) && it->x <= mean_lidarCurr + (std_multiple * std_lidarCurr) )
         {
             minXCurr = minXCurr > it->x ? it->x : minXCurr;
         }
         
     }
 
-/*
 
-    for (auto it = lidarPointsPrev.begin(); it != lidarPointsPrev.end(); ++it)
-    {
-        if(it->y <= (laneWidth/2) && it->y >= (laneWidth/2 * -1))
-        {
-            minXPrev = minXPrev > it->x ? it->x : minXPrev;
-        }
-        
-    }
-
-    for (auto it = lidarPointsCurr.begin(); it != lidarPointsCurr.end(); ++it)
-    {
-        if(it->y <= (laneWidth/2) && it->y >= (laneWidth/2 * -1))
-        {
-            minXCurr = minXCurr > it->x ? it->x : minXCurr;
-        }
-        
-    }*/ //before
-
+    cout << "minXPrev: " << minXPrev << ", minXCurr: " << minXCurr << endl;
     // compute TTC from both measurements
     TTC = minXCurr * dT / (minXPrev - minXCurr);
 }

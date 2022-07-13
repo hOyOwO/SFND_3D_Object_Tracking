@@ -93,6 +93,13 @@ int main(int argc, const char *argv[])
         DataFrame frame;
         frame.cameraImg = img;
         dataBuffer.push_back(frame);
+
+        // Make the normal data buffer to be ring buffer
+        if (dataBuffer.size() > dataBufferSize)
+        {
+            dataBuffer = vector<DataFrame>(dataBuffer.end()-dataBufferSize, dataBuffer.end());
+        }
+
         cout << "Current Index: "<<imgIndex << "/" << imgEndIndex << endl;
         cout << "#1 : LOAD IMAGE INTO BUFFER done" << endl;
 
@@ -151,7 +158,7 @@ int main(int argc, const char *argv[])
 
         // extract 2D keypoints from current image
         vector<cv::KeyPoint> keypoints; // create empty feature list for current image
-        string detectorType = "FAST";
+        string detectorType = "SIFT";
         //vector<string> DetectorTypeVector = {"SHITOMASI", "HARRIS", "FAST", "BRISK", "ORB", "AKAZE", "SIFT"};
         
         if (detectorType.compare("SHITOMASI") == 0)
@@ -190,7 +197,7 @@ int main(int argc, const char *argv[])
         /* EXTRACT KEYPOINT DESCRIPTORS */
 
         cv::Mat descriptors;
-        string descriptorType = "BRIEF"; // BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT
+        string descriptorType = "BRISK"; // BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT
         // vector<string> DescriptorTypeVector = {"BRISK", "BRIEF", "ORB", "FREAK", "AKAZE", "SIFT"};
         descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
 
@@ -207,10 +214,10 @@ int main(int argc, const char *argv[])
             /* MATCH KEYPOINT DESCRIPTORS */
 
             vector<cv::DMatch> matches;
-            string matcherType = "MAT_BF";        // MAT_BF, MAT_FLANN
-            //string matcherType = "MAT_FLANN";        // MAT_BF, MAT_FLANN
-            //string descriptorType = "DES_BINARY"; // DES_BINARY, DES_HOG
-            string descriptorType = "DES_HOG"; // DES_BINARY, DES_HOG
+            //string matcherType = "MAT_BF";        // MAT_BF, MAT_FLANN
+            string matcherType = "MAT_FLANN";        // MAT_BF, MAT_FLANN
+            string descriptorType = "DES_BINARY"; // DES_BINARY, DES_HOG
+            //string descriptorType = "DES_HOG"; // DES_BINARY, DES_HOG
             //string selectorType = "SEL_NN";       // SEL_NN, SEL_KNN
             string selectorType = "SEL_KNN";       // SEL_NN, SEL_KNN
 
