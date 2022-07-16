@@ -51,3 +51,15 @@ In this final project, you will implement the missing parts in the schematic. To
 5. FP.5 : Performance Evaluation 1
     * Look for several examples where you have the impression that the Lidar-based TTC estimate is way off
     * provide a sound argumentation why you think this happened
+    * Good case
+    <img src = "../refdata/example_images/goodCase1.png">
+    <img src = "../refdata/example_images/goodCase2.png">
+    
+    * Bad case
+    <img src = "../refdata/example_images/badCase0.png">
+    <img src = "../refdata/example_images/badCase1.png">
+    <img src = "../refdata/example_images/badCase2.png">
+    * To reduce outlier, I used Normal Distribution method. see below result
+    <img src = "../refdata/example_images/NormalDistributionGraph.png">
+    <img src = "../refdata/example_images/ttcDiff.png">
+

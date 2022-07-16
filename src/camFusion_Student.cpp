@@ -243,7 +243,7 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
 
 
 
-    double std_multiple = 1.8;
+    double std_multiple = 5.0;
     for (auto it = lidarPointsPrev.begin(); it != lidarPointsPrev.end(); ++it)
     {
         if(it->x >= mean_lidarPrev - (std_multiple * std_lidarPrev) && it->x <= mean_lidarPrev + (std_multiple * std_lidarPrev) )

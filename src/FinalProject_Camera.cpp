@@ -75,14 +75,16 @@ int main(int argc, const char *argv[])
     vector<string> DetectorTypeVector = {"SHITOMASI", "HARRIS", "FAST", "BRISK", "ORB", "AKAZE", "SIFT"};
     int DetectorTypeVectorCount = 0; // 0~6
     vector<string> DescriptorTypeVector = {"BRISK", "BRIEF", "FREAK", "SIFT", "ORB", "AKAZE"};
-    int DescriptorTypeVectorCount = 0;
-    for (int p = 0; p < DetectorTypeVector.size(); p++)
+    int DescriptorTypeVectorCount = 0; // 0~5
+    for (int p = 6; p < DetectorTypeVector.size(); p++)
     {
-        DetectorTypeVectorCount = p;
+        //to avoid for loop, applied fixed p,q
+        DetectorTypeVectorCount = 0;
     
-        for (int q = 0 ; q < DescriptorTypeVector.size()  ; q++) // akaze는 별도로 
+        for (int q = 5 ; q < DescriptorTypeVector.size()  ; q++) // akaze는 별도로 
         {
-            DescriptorTypeVectorCount = q;
+            //to avoid for loop, applied fixed p,q
+            DescriptorTypeVectorCount = 0;
 
             // misc
             double sensorFrameRate = 10.0 / imgStepWidth; // frames per second for Lidar and camera
