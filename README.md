@@ -161,19 +161,23 @@ void computeTTCCamera(std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPo
     * Look for several examples where you have the impression that the Lidar-based TTC estimate is way off
     * provide a sound argumentation why you think this happened  
     * Good case  
-    <img src = "refdata/example_images/goodCase1.png" width = 300>  
-    <img src = "refdata/example_images/goodCase2.png" width = 300>  
+    <img src = "refdata/example_images/goodCase1.png" width = 300>    
+    <img src = "refdata/example_images/goodCase2.png" width = 300>   
     There is no outlier point in the two photos above
     
     * Bad case  
-    <img src = "refdata/example_images/badCase0.png" width = 300>  
-    purple point (above image, inside red circle) is outlier, but it does not affect ttc. because that point far from ego vehicle  
-    <img src = "refdata/example_images/badCase1.png" width = 300>  
-    green point (above image, inside red circle) is outlier, and it affect ttc. because that point affect x min value, and it makes ttc shorter than real world
+    
+    <img src = "refdata/example_images/badCase0.png" width = 300>   
+
+    purple point (above image, inside red circle) is outlier, but it does not affect ttc. because that point far from ego vehicle    
+
+    <img src = "refdata/example_images/badCase1.png" width = 300>     
+
+    green point (above image, inside red circle) is outlier, and it affect ttc. because that point affect x min value, and it makes ttc shorter than real world  </br>
 
 
     * To terminate outlier, I used Normal Distribution method. see below result  
-    <img src = "refdata/example_images/NormalDistributionGraph.jpg" width = 200>  
+    <img src = "refdata/example_images/NormalDistributionGraph.jpg" width = 200>   
     <img src = "refdata/example_images/ttcDiff.png" width = 200>  
   6. FP.6 : Performance Evaluation 2
      * Compare lidar ttc and camera ttc (all variation)
