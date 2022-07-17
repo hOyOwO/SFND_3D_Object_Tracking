@@ -162,11 +162,12 @@ void computeTTCCamera(std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPo
     * provide a sound argumentation why you think this happened  
     * Good case  
     <img src = "refdata/example_images/goodCase1.png" width = 300>    
-    <img src = "refdata/example_images/goodCase2.png" width = 300>   
+    <img src = "refdata/example_images/goodCase2.png" width = 300>    
+    
     There is no outlier point in the two photos above
     
     * Bad case  
-    
+
     <img src = "refdata/example_images/badCase0.png" width = 300>   
 
     purple point (above image, inside red circle) is outlier, but it does not affect ttc. because that point far from ego vehicle    
