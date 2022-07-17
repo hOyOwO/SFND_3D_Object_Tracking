@@ -50,7 +50,11 @@ In this final project, you will implement the missing parts in the schematic. To
     * Calculate the TTC with median of ratio.
 5. FP.5 : Performance Evaluation 1
     * Look for several examples where you have the impression that the Lidar-based TTC estimate is way off
+<<<<<<< HEAD
     * provide a sound argumentation why you think this happened  
+=======
+    * provide a sound argumentation why you think this happened
+>>>>>>> d48d67543237a7b1462d5e29a110471a2f97b1ff
     * Good case  
     <img src = "refdata/example_images/goodCase1.png" width = 300>
     <img src = "refdata/example_images/goodCase2.png" width = 300>
@@ -60,6 +64,7 @@ In this final project, you will implement the missing parts in the schematic. To
     <img src = "refdata/example_images/badCase1.png" width = 300>
     <img src = "refdata/example_images/badCase2.png" width = 300>
 
+<<<<<<< HEAD
     * To terminate outlier, I used Normal Distribution method. see below result  
     <img src = "refdata/example_images/NormalDistributionGraph.jpg" width = 200>
     <img src = "refdata/example_images/ttcDiff.png" width = 200>
@@ -72,4 +77,9 @@ In this final project, you will implement the missing parts in the schematic. To
      * See below table (-inf or nan occur, I assigned 100 to calculate)
 
 <img src = "refdata/example_images/finalResult.png">
+=======
+    * To reduce outlier, I used Normal Distribution method. see below result  
+    <img src = "refdata/example_images/NormalDistributionGraph.jpg" width = 200>
+    <img src = "refdata/example_images/ttcDiff.png" width = 200>
+>>>>>>> d48d67543237a7b1462d5e29a110471a2f97b1ff
 

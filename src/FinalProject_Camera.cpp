@@ -79,18 +79,18 @@ int main(int argc, const char *argv[])
     for (int p = 6; p < DetectorTypeVector.size(); p++)
     {
         //to avoid for loop, applied fixed p,q
-        DetectorTypeVectorCount = 0;
+        DetectorTypeVectorCount = 6;
     
         for (int q = 5 ; q < DescriptorTypeVector.size()  ; q++) // akaze는 별도로 
         {
             //to avoid for loop, applied fixed p,q
-            DescriptorTypeVectorCount = 0;
+            DescriptorTypeVectorCount = 3;
 
             // misc
             double sensorFrameRate = 10.0 / imgStepWidth; // frames per second for Lidar and camera
             int dataBufferSize = 2;       // no. of images which are held in memory (ring buffer) at the same time
             vector<DataFrame> dataBuffer; // list of data frames which are held in memory at the same time
-            bool bVis = false;            // visualize results
+            bool bVis = true;            // visualize results
 
         
             
@@ -192,7 +192,7 @@ int main(int argc, const char *argv[])
                 
                 if (detectorType.compare("SHITOMASI") == 0)
                 {
-                    detKeypointsShiTomasi(keypoints, imgGray, false);
+                    detKeypointsShiTomasi(keypoints, imgGray, bVis);
                 }
                 else if(detectorType.compare("HARRIS") == 0)
                     {
@@ -247,8 +247,8 @@ int main(int argc, const char *argv[])
                     vector<cv::DMatch> matches;
                     //string matcherType = "MAT_BF";        // MAT_BF, MAT_FLANN
                     string matcherType = "MAT_FLANN";        // MAT_BF, MAT_FLANN
-                    string descriptorType = "DES_BINARY"; // DES_BINARY, DES_HOG
-                    //string descriptorType = "DES_HOG"; // DES_BINARY, DES_HOG
+                    //string descriptorType = "DES_BINARY"; // DES_BINARY, DES_HOG
+                    string descriptorType = "DES_HOG"; // DES_BINARY, DES_HOG
                     //string selectorType = "SEL_NN";       // SEL_NN, SEL_KNN
                     string selectorType = "SEL_KNN";       // SEL_NN, SEL_KNN
 

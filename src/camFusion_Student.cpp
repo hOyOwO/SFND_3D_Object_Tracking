@@ -139,26 +139,51 @@ void show3DObjects(std::vector<BoundingBox> &boundingBoxes, cv::Size worldSize, 
 // associate a given bounding box with the keypoints it contains
 void clusterKptMatchesWithROI(BoundingBox &boundingBox, std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPoint> &kptsCurr, std::vector<cv::DMatch> &kptMatches)
 {
-    float distance_sum = 0;
+    vector<float> matchedDistances;
+    float tempDistance;
     for (auto match : kptMatches)
     {
-        distance_sum += abs(match.distance);
+        const cv::KeyPoint kptPrev = kptsPrev[match.queryIdx];
+        const cv::KeyPoint kptCurr = kptsCurr[match.trainIdx];
+        
+        tempDistance = sqrt(pow(kptPrev.pt.x-kptCurr.pt.x, 2) + pow(kptPrev.pt.y-kptCurr.pt.y, 2));
+        matchedDistances.push_back(tempDistance);
+        //cout << "match.distance: " <<match.distance << endl;
+        //cout << "tempDistance: "<<tempDistance << endl;
+        
     }
 
-    float distance_mean = distance_sum / kptMatches.size();
+    sort(matchedDistances.begin(), matchedDistances.end());
+    
+    /*
+    for (int i = 0; i < matchedDistances.size() ; i++)
+    {
+        cout << "matchedDistance[" <<i << "]: " <<matchedDistances[i] << endl;
+    }
+    cout << "kptMatches.size(): "<< kptMatches.size() << endl;
+    */
+    const float Q1 = matchedDistances[matchedDistances.size() / 4];
+    const float Q3 = matchedDistances[matchedDistances.size() * 3/ 4];
+    const float IQR = Q3 - Q1;
+    const float lowOutlier = Q1 - 1.5 * IQR;
+    const float highOutlier = Q3 + 1.5 * IQR;
+
 
     for (auto match : kptMatches)
     {
         const cv::KeyPoint kptPrev = kptsPrev[match.queryIdx];
         const cv::KeyPoint kptCurr = kptsCurr[match.trainIdx];
+        
+        tempDistance = sqrt(pow(kptPrev.pt.x-kptCurr.pt.x, 2) + pow(kptPrev.pt.y-kptCurr.pt.y, 2));
 
-        if (boundingBox.roi.contains(kptCurr.pt) && abs(match.distance) < abs(distance_mean))
+        if (boundingBox.roi.contains(kptCurr.pt) && lowOutlier < tempDistance && tempDistance < highOutlier )
         {
             boundingBox.keypoints.push_back(kptCurr);
             boundingBox.kptMatches.push_back(match);
         }
     }
 }
+
 
 
 // Compute time-to-collision (TTC) based on keypoint correspondences in successive images
@@ -243,7 +268,7 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
 
 
 
-    double std_multiple = 5.0;
+    double std_multiple = 1.8;
     for (auto it = lidarPointsPrev.begin(); it != lidarPointsPrev.end(); ++it)
     {
         if(it->x >= mean_lidarPrev - (std_multiple * std_lidarPrev) && it->x <= mean_lidarPrev + (std_multiple * std_lidarPrev) )
