@@ -158,14 +158,14 @@ void computeTTCCamera(std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPo
 ```
 
 5. FP.5 : Performance Evaluation 1
-    * Look for several examples where you have the impression that the Lidar-based TTC estimate is way off
-    * provide a sound argumentation why you think this happened  
-    * Good case  
-    <img src = "refdata/example_images/goodCase1.png" width = 300>    
-    <img src = "refdata/example_images/goodCase2.png" width = 300>    
-    
-    There is no outlier point in the two photos above
-    
+    * Estimating TTC with Lidar (lecture. Engineering a Collision Detection System)
+      * TTC = d1/v0
+      * If v0 constant, TTC depends on d1
+      * As you can see below bad cases, outlier makes d1 closer than it really is
+      * This is why removing outliers improves TTC estimating
+
+    <img src = "refdata/example_images/lidarTTCformula.png" width = 400> 
+  
     * Bad case  
 
     <img src = "refdata/example_images/badCase0.png" width = 300>   
@@ -179,7 +179,15 @@ void computeTTCCamera(std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPo
 
     * To terminate outlier, I used Normal Distribution method. see below result  
     <img src = "refdata/example_images/NormalDistributionGraph.jpg" width = 200>   
-    <img src = "refdata/example_images/ttcDiff.png" width = 200>  
+    <img src = "refdata/example_images/ttcDiff.png" width = 200> 
+
+    * Good case  
+    <img src = "refdata/example_images/goodCase1.png" width = 300>    
+    <img src = "refdata/example_images/goodCase2.png" width = 300>    
+
+    There is no outlier point in the two photos above
+
+
   6. FP.6 : Performance Evaluation 2
      * Compare lidar ttc and camera ttc (all variation)
      * Rank performance
